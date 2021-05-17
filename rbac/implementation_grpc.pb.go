@@ -18,7 +18,7 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type RbacServiceClient interface {
-	CreateRbacInstance(ctx context.Context, in *CreateRbacInstanceRequest, opts ...grpc.CallOption) (*CreateRbacInstanceResponse, error)
+	CreateRbacInstance(ctx context.Context, in *EmptyRequest, opts ...grpc.CallOption) (*EmptyResponse, error)
 	AddChildSubjectToParentSubject(ctx context.Context, in *AddChildSubjectToParentSubjectRequest, opts ...grpc.CallOption) (*EmptyResponse, error)
 	GrantPermissionToSubject(ctx context.Context, in *GrantPermissionToSubjectRequest, opts ...grpc.CallOption) (*EmptyResponse, error)
 	HasPermission(ctx context.Context, in *HasPermissionRequest, opts ...grpc.CallOption) (*HasPermissionResponse, error)
@@ -32,8 +32,8 @@ func NewRbacServiceClient(cc grpc.ClientConnInterface) RbacServiceClient {
 	return &rbacServiceClient{cc}
 }
 
-func (c *rbacServiceClient) CreateRbacInstance(ctx context.Context, in *CreateRbacInstanceRequest, opts ...grpc.CallOption) (*CreateRbacInstanceResponse, error) {
-	out := new(CreateRbacInstanceResponse)
+func (c *rbacServiceClient) CreateRbacInstance(ctx context.Context, in *EmptyRequest, opts ...grpc.CallOption) (*EmptyResponse, error) {
+	out := new(EmptyResponse)
 	err := c.cc.Invoke(ctx, "/buttress.RbacService/CreateRbacInstance", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -72,7 +72,7 @@ func (c *rbacServiceClient) HasPermission(ctx context.Context, in *HasPermission
 // All implementations must embed UnimplementedRbacServiceServer
 // for forward compatibility
 type RbacServiceServer interface {
-	CreateRbacInstance(context.Context, *CreateRbacInstanceRequest) (*CreateRbacInstanceResponse, error)
+	CreateRbacInstance(context.Context, *EmptyRequest) (*EmptyResponse, error)
 	AddChildSubjectToParentSubject(context.Context, *AddChildSubjectToParentSubjectRequest) (*EmptyResponse, error)
 	GrantPermissionToSubject(context.Context, *GrantPermissionToSubjectRequest) (*EmptyResponse, error)
 	HasPermission(context.Context, *HasPermissionRequest) (*HasPermissionResponse, error)
@@ -83,7 +83,7 @@ type RbacServiceServer interface {
 type UnimplementedRbacServiceServer struct {
 }
 
-func (UnimplementedRbacServiceServer) CreateRbacInstance(context.Context, *CreateRbacInstanceRequest) (*CreateRbacInstanceResponse, error) {
+func (UnimplementedRbacServiceServer) CreateRbacInstance(context.Context, *EmptyRequest) (*EmptyResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateRbacInstance not implemented")
 }
 func (UnimplementedRbacServiceServer) AddChildSubjectToParentSubject(context.Context, *AddChildSubjectToParentSubjectRequest) (*EmptyResponse, error) {
@@ -109,7 +109,7 @@ func RegisterRbacServiceServer(s grpc.ServiceRegistrar, srv RbacServiceServer) {
 }
 
 func _RbacService_CreateRbacInstance_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CreateRbacInstanceRequest)
+	in := new(EmptyRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -121,7 +121,7 @@ func _RbacService_CreateRbacInstance_Handler(srv interface{}, ctx context.Contex
 		FullMethod: "/buttress.RbacService/CreateRbacInstance",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(RbacServiceServer).CreateRbacInstance(ctx, req.(*CreateRbacInstanceRequest))
+		return srv.(RbacServiceServer).CreateRbacInstance(ctx, req.(*EmptyRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
