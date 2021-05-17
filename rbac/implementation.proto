@@ -4,7 +4,7 @@ option go_package = "github.com/merajsahebdar/buttress-implementation-go/rbac";
 package buttress;
 
 service RbacService {
-  rpc CreateRbacInstance(CreateRbacInstanceRequest) returns (CreateRbacInstanceResponse) {}
+  rpc CreateRbacInstance(EmptyRequest) returns (EmptyResponse) {}
   rpc AddChildSubjectToParentSubject(AddChildSubjectToParentSubjectRequest) returns (EmptyResponse) {}
   rpc GrantPermissionToSubject(GrantPermissionToSubjectRequest) returns (EmptyResponse) {}
   rpc HasPermission(HasPermissionRequest) returns (HasPermissionResponse) {}
@@ -15,34 +15,23 @@ message EmptyRequest {}
 message EmptyResponse {}
 
 message PermissionDefinition {
-  string object = 3;
-  string action = 4;
-}
-
-message CreateRbacInstanceRequest {
-  string name = 1;
-}
-
-message CreateRbacInstanceResponse {
-  string instance = 1;
+  string object = 1;
+  string action = 2;
 }
 
 message AddChildSubjectToParentSubjectRequest {
-  string instance = 1;
-  string child = 2;
-  string parent = 3;
+  string child = 1;
+  string parent = 2;
 }
 
 message GrantPermissionToSubjectRequest {
-  string instance = 1;
-  string subject = 2;
-  PermissionDefinition permission = 3;
+  string subject = 1;
+  PermissionDefinition permission = 2;
 }
 
 message HasPermissionRequest {
-  string instance = 1;
-  string subject = 2;
-  PermissionDefinition permission = 3;
+  string subject = 1;
+  PermissionDefinition permission = 2;
 }
 
 message HasPermissionResponse {
