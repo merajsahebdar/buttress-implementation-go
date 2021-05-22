@@ -18,10 +18,15 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type RbacServiceClient interface {
+	// Instance management
 	CreateRbacInstance(ctx context.Context, in *EmptyRequest, opts ...grpc.CallOption) (*EmptyResponse, error)
+	// Subjects Management
 	AddChildSubjectToParentSubject(ctx context.Context, in *AddChildSubjectToParentSubjectRequest, opts ...grpc.CallOption) (*EmptyResponse, error)
-	GrantPermissionToSubject(ctx context.Context, in *GrantPermissionToSubjectRequest, opts ...grpc.CallOption) (*EmptyResponse, error)
-	TakePermissionBackFromSubject(ctx context.Context, in *TakePermissionBackFromSubjectRequest, opts ...grpc.CallOption) (*EmptyResponse, error)
+	RemoveChildSubjectFromParentSubject(ctx context.Context, in *RemoveChildSubjectFromParentSubjectRequest, opts ...grpc.CallOption) (*EmptyResponse, error)
+	// Permissions Management
+	GrantPermission(ctx context.Context, in *GrantPermissionRequest, opts ...grpc.CallOption) (*EmptyResponse, error)
+	RevokePermission(ctx context.Context, in *RevokePermissionRequest, opts ...grpc.CallOption) (*EmptyResponse, error)
+	// Permissions Check
 	HasPermission(ctx context.Context, in *HasPermissionRequest, opts ...grpc.CallOption) (*HasPermissionResponse, error)
 }
 
@@ -51,18 +56,27 @@ func (c *rbacServiceClient) AddChildSubjectToParentSubject(ctx context.Context, 
 	return out, nil
 }
 
-func (c *rbacServiceClient) GrantPermissionToSubject(ctx context.Context, in *GrantPermissionToSubjectRequest, opts ...grpc.CallOption) (*EmptyResponse, error) {
+func (c *rbacServiceClient) RemoveChildSubjectFromParentSubject(ctx context.Context, in *RemoveChildSubjectFromParentSubjectRequest, opts ...grpc.CallOption) (*EmptyResponse, error) {
 	out := new(EmptyResponse)
-	err := c.cc.Invoke(ctx, "/buttress.RbacService/GrantPermissionToSubject", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/buttress.RbacService/RemoveChildSubjectFromParentSubject", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *rbacServiceClient) TakePermissionBackFromSubject(ctx context.Context, in *TakePermissionBackFromSubjectRequest, opts ...grpc.CallOption) (*EmptyResponse, error) {
+func (c *rbacServiceClient) GrantPermission(ctx context.Context, in *GrantPermissionRequest, opts ...grpc.CallOption) (*EmptyResponse, error) {
 	out := new(EmptyResponse)
-	err := c.cc.Invoke(ctx, "/buttress.RbacService/TakePermissionBackFromSubject", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/buttress.RbacService/GrantPermission", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *rbacServiceClient) RevokePermission(ctx context.Context, in *RevokePermissionRequest, opts ...grpc.CallOption) (*EmptyResponse, error) {
+	out := new(EmptyResponse)
+	err := c.cc.Invoke(ctx, "/buttress.RbacService/RevokePermission", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -82,10 +96,15 @@ func (c *rbacServiceClient) HasPermission(ctx context.Context, in *HasPermission
 // All implementations must embed UnimplementedRbacServiceServer
 // for forward compatibility
 type RbacServiceServer interface {
+	// Instance management
 	CreateRbacInstance(context.Context, *EmptyRequest) (*EmptyResponse, error)
+	// Subjects Management
 	AddChildSubjectToParentSubject(context.Context, *AddChildSubjectToParentSubjectRequest) (*EmptyResponse, error)
-	GrantPermissionToSubject(context.Context, *GrantPermissionToSubjectRequest) (*EmptyResponse, error)
-	TakePermissionBackFromSubject(context.Context, *TakePermissionBackFromSubjectRequest) (*EmptyResponse, error)
+	RemoveChildSubjectFromParentSubject(context.Context, *RemoveChildSubjectFromParentSubjectRequest) (*EmptyResponse, error)
+	// Permissions Management
+	GrantPermission(context.Context, *GrantPermissionRequest) (*EmptyResponse, error)
+	RevokePermission(context.Context, *RevokePermissionRequest) (*EmptyResponse, error)
+	// Permissions Check
 	HasPermission(context.Context, *HasPermissionRequest) (*HasPermissionResponse, error)
 	mustEmbedUnimplementedRbacServiceServer()
 }
@@ -100,11 +119,14 @@ func (UnimplementedRbacServiceServer) CreateRbacInstance(context.Context, *Empty
 func (UnimplementedRbacServiceServer) AddChildSubjectToParentSubject(context.Context, *AddChildSubjectToParentSubjectRequest) (*EmptyResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddChildSubjectToParentSubject not implemented")
 }
-func (UnimplementedRbacServiceServer) GrantPermissionToSubject(context.Context, *GrantPermissionToSubjectRequest) (*EmptyResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GrantPermissionToSubject not implemented")
+func (UnimplementedRbacServiceServer) RemoveChildSubjectFromParentSubject(context.Context, *RemoveChildSubjectFromParentSubjectRequest) (*EmptyResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RemoveChildSubjectFromParentSubject not implemented")
 }
-func (UnimplementedRbacServiceServer) TakePermissionBackFromSubject(context.Context, *TakePermissionBackFromSubjectRequest) (*EmptyResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method TakePermissionBackFromSubject not implemented")
+func (UnimplementedRbacServiceServer) GrantPermission(context.Context, *GrantPermissionRequest) (*EmptyResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GrantPermission not implemented")
+}
+func (UnimplementedRbacServiceServer) RevokePermission(context.Context, *RevokePermissionRequest) (*EmptyResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RevokePermission not implemented")
 }
 func (UnimplementedRbacServiceServer) HasPermission(context.Context, *HasPermissionRequest) (*HasPermissionResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method HasPermission not implemented")
@@ -158,38 +180,56 @@ func _RbacService_AddChildSubjectToParentSubject_Handler(srv interface{}, ctx co
 	return interceptor(ctx, in, info, handler)
 }
 
-func _RbacService_GrantPermissionToSubject_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GrantPermissionToSubjectRequest)
+func _RbacService_RemoveChildSubjectFromParentSubject_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RemoveChildSubjectFromParentSubjectRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(RbacServiceServer).GrantPermissionToSubject(ctx, in)
+		return srv.(RbacServiceServer).RemoveChildSubjectFromParentSubject(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/buttress.RbacService/GrantPermissionToSubject",
+		FullMethod: "/buttress.RbacService/RemoveChildSubjectFromParentSubject",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(RbacServiceServer).GrantPermissionToSubject(ctx, req.(*GrantPermissionToSubjectRequest))
+		return srv.(RbacServiceServer).RemoveChildSubjectFromParentSubject(ctx, req.(*RemoveChildSubjectFromParentSubjectRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _RbacService_TakePermissionBackFromSubject_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(TakePermissionBackFromSubjectRequest)
+func _RbacService_GrantPermission_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GrantPermissionRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(RbacServiceServer).TakePermissionBackFromSubject(ctx, in)
+		return srv.(RbacServiceServer).GrantPermission(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/buttress.RbacService/TakePermissionBackFromSubject",
+		FullMethod: "/buttress.RbacService/GrantPermission",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(RbacServiceServer).TakePermissionBackFromSubject(ctx, req.(*TakePermissionBackFromSubjectRequest))
+		return srv.(RbacServiceServer).GrantPermission(ctx, req.(*GrantPermissionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _RbacService_RevokePermission_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RevokePermissionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RbacServiceServer).RevokePermission(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/buttress.RbacService/RevokePermission",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RbacServiceServer).RevokePermission(ctx, req.(*RevokePermissionRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -228,12 +268,16 @@ var RbacService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _RbacService_AddChildSubjectToParentSubject_Handler,
 		},
 		{
-			MethodName: "GrantPermissionToSubject",
-			Handler:    _RbacService_GrantPermissionToSubject_Handler,
+			MethodName: "RemoveChildSubjectFromParentSubject",
+			Handler:    _RbacService_RemoveChildSubjectFromParentSubject_Handler,
 		},
 		{
-			MethodName: "TakePermissionBackFromSubject",
-			Handler:    _RbacService_TakePermissionBackFromSubject_Handler,
+			MethodName: "GrantPermission",
+			Handler:    _RbacService_GrantPermission_Handler,
+		},
+		{
+			MethodName: "RevokePermission",
+			Handler:    _RbacService_RevokePermission_Handler,
 		},
 		{
 			MethodName: "HasPermission",

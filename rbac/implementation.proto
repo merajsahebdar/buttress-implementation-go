@@ -3,13 +3,29 @@ syntax = "proto3";
 option go_package = "github.com/merajsahebdar/buttress-implementation-go/rbac";
 package buttress;
 
+// -----------------------------------------------------------------------------
+// Service
+// -----------------------------------------------------------------------------
+
 service RbacService {
+  // Instance management
   rpc CreateRbacInstance(EmptyRequest) returns (EmptyResponse) {}
+
+  // Subjects Management
   rpc AddChildSubjectToParentSubject(AddChildSubjectToParentSubjectRequest) returns (EmptyResponse) {}
-  rpc GrantPermissionToSubject(GrantPermissionToSubjectRequest) returns (EmptyResponse) {}
-  rpc TakePermissionBackFromSubject(TakePermissionBackFromSubjectRequest) returns (EmptyResponse) {}
+  rpc RemoveChildSubjectFromParentSubject(RemoveChildSubjectFromParentSubjectRequest) returns (EmptyResponse) {}
+
+  // Permissions Management
+  rpc GrantPermission(GrantPermissionRequest) returns (EmptyResponse) {}
+  rpc RevokePermission(RevokePermissionRequest) returns (EmptyResponse) {}
+
+  // Permissions Check
   rpc HasPermission(HasPermissionRequest) returns (HasPermissionResponse) {}
 }
+
+// -----------------------------------------------------------------------------
+// Common Defs
+// -----------------------------------------------------------------------------
 
 message EmptyRequest {}
 
@@ -20,20 +36,37 @@ message PermissionDefinition {
   string action = 2;
 }
 
+// -----------------------------------------------------------------------------
+// Subjects Management Defs
+// -----------------------------------------------------------------------------
+
 message AddChildSubjectToParentSubjectRequest {
   string child = 1;
   string parent = 2;
 }
 
-message GrantPermissionToSubjectRequest {
+message RemoveChildSubjectFromParentSubjectRequest {
+  string child = 1;
+  string parent = 2;
+}
+
+// -----------------------------------------------------------------------------
+// Permissions Management Defs
+// -----------------------------------------------------------------------------
+
+message GrantPermissionRequest {
   string subject = 1;
   PermissionDefinition permission = 2;
 }
 
-message TakePermissionBackFromSubjectRequest {
+message RevokePermissionRequest {
   string subject = 1;
   PermissionDefinition permission = 2;
 }
+
+// -----------------------------------------------------------------------------
+// Permissions Check Defs
+// -----------------------------------------------------------------------------
 
 message HasPermissionRequest {
   string subject = 1;
