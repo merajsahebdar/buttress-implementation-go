@@ -7,6 +7,7 @@ service RbacService {
   rpc CreateRbacInstance(EmptyRequest) returns (EmptyResponse) {}
   rpc AddChildSubjectToParentSubject(AddChildSubjectToParentSubjectRequest) returns (EmptyResponse) {}
   rpc GrantPermissionToSubject(GrantPermissionToSubjectRequest) returns (EmptyResponse) {}
+  rpc TakePermissionBackFromSubject(TakePermissionBackFromSubjectRequest) returns (EmptyResponse) {}
   rpc HasPermission(HasPermissionRequest) returns (HasPermissionResponse) {}
 }
 
@@ -25,6 +26,11 @@ message AddChildSubjectToParentSubjectRequest {
 }
 
 message GrantPermissionToSubjectRequest {
+  string subject = 1;
+  PermissionDefinition permission = 2;
+}
+
+message TakePermissionBackFromSubjectRequest {
   string subject = 1;
   PermissionDefinition permission = 2;
 }
