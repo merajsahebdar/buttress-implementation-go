@@ -16,6 +16,6 @@ insert_final_newline = true
 # editorconfig-tools is unable to ignore longs strings or urls
 max_line_length = off
 
-[*.{go,mod}]
+[{*.{go,mod},Makefile}]
 indent_style = tab
 indent_size = 4
