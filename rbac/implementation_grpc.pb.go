@@ -19,13 +19,16 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type RbacServiceClient interface {
 	// Instance management
-	CreateRbacInstance(ctx context.Context, in *EmptyRequest, opts ...grpc.CallOption) (*EmptyResponse, error)
+	EnsureRbacInstance(ctx context.Context, in *EmptyRequest, opts ...grpc.CallOption) (*EmptyResponse, error)
 	// Subjects Management
 	AddChildSubjectToParentSubject(ctx context.Context, in *AddChildSubjectToParentSubjectRequest, opts ...grpc.CallOption) (*EmptyResponse, error)
 	RemoveChildSubjectFromParentSubject(ctx context.Context, in *RemoveChildSubjectFromParentSubjectRequest, opts ...grpc.CallOption) (*EmptyResponse, error)
-	// Permissions Management
-	GrantPermission(ctx context.Context, in *GrantPermissionRequest, opts ...grpc.CallOption) (*EmptyResponse, error)
-	RevokePermission(ctx context.Context, in *RevokePermissionRequest, opts ...grpc.CallOption) (*EmptyResponse, error)
+	RemoveSubject(ctx context.Context, in *RemoveSubjectRequest, opts ...grpc.CallOption) (*EmptyResponse, error)
+	// Policies Management
+	CreatePolicy(ctx context.Context, in *CreatePolicyRequest, opts ...grpc.CallOption) (*EmptyResponse, error)
+	RemovePolicy(ctx context.Context, in *RemovePolicyRequest, opts ...grpc.CallOption) (*EmptyResponse, error)
+	CreatePolicies(ctx context.Context, in *CreatePoliciesRequest, opts ...grpc.CallOption) (*EmptyResponse, error)
+	RemovePolicies(ctx context.Context, in *RemovePoliciesRequest, opts ...grpc.CallOption) (*EmptyResponse, error)
 	// Permissions Check
 	HasPermission(ctx context.Context, in *HasPermissionRequest, opts ...grpc.CallOption) (*HasPermissionResponse, error)
 }
@@ -38,9 +41,9 @@ func NewRbacServiceClient(cc grpc.ClientConnInterface) RbacServiceClient {
 	return &rbacServiceClient{cc}
 }
 
-func (c *rbacServiceClient) CreateRbacInstance(ctx context.Context, in *EmptyRequest, opts ...grpc.CallOption) (*EmptyResponse, error) {
+func (c *rbacServiceClient) EnsureRbacInstance(ctx context.Context, in *EmptyRequest, opts ...grpc.CallOption) (*EmptyResponse, error) {
 	out := new(EmptyResponse)
-	err := c.cc.Invoke(ctx, "/buttress.RbacService/CreateRbacInstance", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/buttress.RbacService/EnsureRbacInstance", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -65,18 +68,45 @@ func (c *rbacServiceClient) RemoveChildSubjectFromParentSubject(ctx context.Cont
 	return out, nil
 }
 
-func (c *rbacServiceClient) GrantPermission(ctx context.Context, in *GrantPermissionRequest, opts ...grpc.CallOption) (*EmptyResponse, error) {
+func (c *rbacServiceClient) RemoveSubject(ctx context.Context, in *RemoveSubjectRequest, opts ...grpc.CallOption) (*EmptyResponse, error) {
 	out := new(EmptyResponse)
-	err := c.cc.Invoke(ctx, "/buttress.RbacService/GrantPermission", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/buttress.RbacService/RemoveSubject", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *rbacServiceClient) RevokePermission(ctx context.Context, in *RevokePermissionRequest, opts ...grpc.CallOption) (*EmptyResponse, error) {
+func (c *rbacServiceClient) CreatePolicy(ctx context.Context, in *CreatePolicyRequest, opts ...grpc.CallOption) (*EmptyResponse, error) {
 	out := new(EmptyResponse)
-	err := c.cc.Invoke(ctx, "/buttress.RbacService/RevokePermission", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/buttress.RbacService/CreatePolicy", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *rbacServiceClient) RemovePolicy(ctx context.Context, in *RemovePolicyRequest, opts ...grpc.CallOption) (*EmptyResponse, error) {
+	out := new(EmptyResponse)
+	err := c.cc.Invoke(ctx, "/buttress.RbacService/RemovePolicy", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *rbacServiceClient) CreatePolicies(ctx context.Context, in *CreatePoliciesRequest, opts ...grpc.CallOption) (*EmptyResponse, error) {
+	out := new(EmptyResponse)
+	err := c.cc.Invoke(ctx, "/buttress.RbacService/CreatePolicies", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *rbacServiceClient) RemovePolicies(ctx context.Context, in *RemovePoliciesRequest, opts ...grpc.CallOption) (*EmptyResponse, error) {
+	out := new(EmptyResponse)
+	err := c.cc.Invoke(ctx, "/buttress.RbacService/RemovePolicies", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -97,13 +127,16 @@ func (c *rbacServiceClient) HasPermission(ctx context.Context, in *HasPermission
 // for forward compatibility
 type RbacServiceServer interface {
 	// Instance management
-	CreateRbacInstance(context.Context, *EmptyRequest) (*EmptyResponse, error)
+	EnsureRbacInstance(context.Context, *EmptyRequest) (*EmptyResponse, error)
 	// Subjects Management
 	AddChildSubjectToParentSubject(context.Context, *AddChildSubjectToParentSubjectRequest) (*EmptyResponse, error)
 	RemoveChildSubjectFromParentSubject(context.Context, *RemoveChildSubjectFromParentSubjectRequest) (*EmptyResponse, error)
-	// Permissions Management
-	GrantPermission(context.Context, *GrantPermissionRequest) (*EmptyResponse, error)
-	RevokePermission(context.Context, *RevokePermissionRequest) (*EmptyResponse, error)
+	RemoveSubject(context.Context, *RemoveSubjectRequest) (*EmptyResponse, error)
+	// Policies Management
+	CreatePolicy(context.Context, *CreatePolicyRequest) (*EmptyResponse, error)
+	RemovePolicy(context.Context, *RemovePolicyRequest) (*EmptyResponse, error)
+	CreatePolicies(context.Context, *CreatePoliciesRequest) (*EmptyResponse, error)
+	RemovePolicies(context.Context, *RemovePoliciesRequest) (*EmptyResponse, error)
 	// Permissions Check
 	HasPermission(context.Context, *HasPermissionRequest) (*HasPermissionResponse, error)
 	mustEmbedUnimplementedRbacServiceServer()
@@ -113,8 +146,8 @@ type RbacServiceServer interface {
 type UnimplementedRbacServiceServer struct {
 }
 
-func (UnimplementedRbacServiceServer) CreateRbacInstance(context.Context, *EmptyRequest) (*EmptyResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method CreateRbacInstance not implemented")
+func (UnimplementedRbacServiceServer) EnsureRbacInstance(context.Context, *EmptyRequest) (*EmptyResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method EnsureRbacInstance not implemented")
 }
 func (UnimplementedRbacServiceServer) AddChildSubjectToParentSubject(context.Context, *AddChildSubjectToParentSubjectRequest) (*EmptyResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddChildSubjectToParentSubject not implemented")
@@ -122,11 +155,20 @@ func (UnimplementedRbacServiceServer) AddChildSubjectToParentSubject(context.Con
 func (UnimplementedRbacServiceServer) RemoveChildSubjectFromParentSubject(context.Context, *RemoveChildSubjectFromParentSubjectRequest) (*EmptyResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RemoveChildSubjectFromParentSubject not implemented")
 }
-func (UnimplementedRbacServiceServer) GrantPermission(context.Context, *GrantPermissionRequest) (*EmptyResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GrantPermission not implemented")
+func (UnimplementedRbacServiceServer) RemoveSubject(context.Context, *RemoveSubjectRequest) (*EmptyResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RemoveSubject not implemented")
 }
-func (UnimplementedRbacServiceServer) RevokePermission(context.Context, *RevokePermissionRequest) (*EmptyResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method RevokePermission not implemented")
+func (UnimplementedRbacServiceServer) CreatePolicy(context.Context, *CreatePolicyRequest) (*EmptyResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreatePolicy not implemented")
+}
+func (UnimplementedRbacServiceServer) RemovePolicy(context.Context, *RemovePolicyRequest) (*EmptyResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RemovePolicy not implemented")
+}
+func (UnimplementedRbacServiceServer) CreatePolicies(context.Context, *CreatePoliciesRequest) (*EmptyResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreatePolicies not implemented")
+}
+func (UnimplementedRbacServiceServer) RemovePolicies(context.Context, *RemovePoliciesRequest) (*EmptyResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RemovePolicies not implemented")
 }
 func (UnimplementedRbacServiceServer) HasPermission(context.Context, *HasPermissionRequest) (*HasPermissionResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method HasPermission not implemented")
@@ -144,20 +186,20 @@ func RegisterRbacServiceServer(s grpc.ServiceRegistrar, srv RbacServiceServer) {
 	s.RegisterService(&RbacService_ServiceDesc, srv)
 }
 
-func _RbacService_CreateRbacInstance_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _RbacService_EnsureRbacInstance_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(EmptyRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(RbacServiceServer).CreateRbacInstance(ctx, in)
+		return srv.(RbacServiceServer).EnsureRbacInstance(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/buttress.RbacService/CreateRbacInstance",
+		FullMethod: "/buttress.RbacService/EnsureRbacInstance",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(RbacServiceServer).CreateRbacInstance(ctx, req.(*EmptyRequest))
+		return srv.(RbacServiceServer).EnsureRbacInstance(ctx, req.(*EmptyRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -198,38 +240,92 @@ func _RbacService_RemoveChildSubjectFromParentSubject_Handler(srv interface{}, c
 	return interceptor(ctx, in, info, handler)
 }
 
-func _RbacService_GrantPermission_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GrantPermissionRequest)
+func _RbacService_RemoveSubject_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RemoveSubjectRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(RbacServiceServer).GrantPermission(ctx, in)
+		return srv.(RbacServiceServer).RemoveSubject(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/buttress.RbacService/GrantPermission",
+		FullMethod: "/buttress.RbacService/RemoveSubject",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(RbacServiceServer).GrantPermission(ctx, req.(*GrantPermissionRequest))
+		return srv.(RbacServiceServer).RemoveSubject(ctx, req.(*RemoveSubjectRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _RbacService_RevokePermission_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(RevokePermissionRequest)
+func _RbacService_CreatePolicy_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreatePolicyRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(RbacServiceServer).RevokePermission(ctx, in)
+		return srv.(RbacServiceServer).CreatePolicy(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/buttress.RbacService/RevokePermission",
+		FullMethod: "/buttress.RbacService/CreatePolicy",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(RbacServiceServer).RevokePermission(ctx, req.(*RevokePermissionRequest))
+		return srv.(RbacServiceServer).CreatePolicy(ctx, req.(*CreatePolicyRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _RbacService_RemovePolicy_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RemovePolicyRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RbacServiceServer).RemovePolicy(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/buttress.RbacService/RemovePolicy",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RbacServiceServer).RemovePolicy(ctx, req.(*RemovePolicyRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _RbacService_CreatePolicies_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreatePoliciesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RbacServiceServer).CreatePolicies(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/buttress.RbacService/CreatePolicies",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RbacServiceServer).CreatePolicies(ctx, req.(*CreatePoliciesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _RbacService_RemovePolicies_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RemovePoliciesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RbacServiceServer).RemovePolicies(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/buttress.RbacService/RemovePolicies",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RbacServiceServer).RemovePolicies(ctx, req.(*RemovePoliciesRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -260,8 +356,8 @@ var RbacService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*RbacServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "CreateRbacInstance",
-			Handler:    _RbacService_CreateRbacInstance_Handler,
+			MethodName: "EnsureRbacInstance",
+			Handler:    _RbacService_EnsureRbacInstance_Handler,
 		},
 		{
 			MethodName: "AddChildSubjectToParentSubject",
@@ -272,12 +368,24 @@ var RbacService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _RbacService_RemoveChildSubjectFromParentSubject_Handler,
 		},
 		{
-			MethodName: "GrantPermission",
-			Handler:    _RbacService_GrantPermission_Handler,
+			MethodName: "RemoveSubject",
+			Handler:    _RbacService_RemoveSubject_Handler,
 		},
 		{
-			MethodName: "RevokePermission",
-			Handler:    _RbacService_RevokePermission_Handler,
+			MethodName: "CreatePolicy",
+			Handler:    _RbacService_CreatePolicy_Handler,
+		},
+		{
+			MethodName: "RemovePolicy",
+			Handler:    _RbacService_RemovePolicy_Handler,
+		},
+		{
+			MethodName: "CreatePolicies",
+			Handler:    _RbacService_CreatePolicies_Handler,
+		},
+		{
+			MethodName: "RemovePolicies",
+			Handler:    _RbacService_RemovePolicies_Handler,
 		},
 		{
 			MethodName: "HasPermission",

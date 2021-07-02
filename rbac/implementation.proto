@@ -14,10 +14,13 @@ service RbacService {
   // Subjects Management
   rpc AddChildSubjectToParentSubject(AddChildSubjectToParentSubjectRequest) returns (EmptyResponse) {}
   rpc RemoveChildSubjectFromParentSubject(RemoveChildSubjectFromParentSubjectRequest) returns (EmptyResponse) {}
+  rpc RemoveSubject(RemoveSubjectRequest) returns (EmptyResponse) {}
 
-  // Permissions Management
-  rpc GrantPermission(GrantPermissionRequest) returns (EmptyResponse) {}
-  rpc RevokePermission(RevokePermissionRequest) returns (EmptyResponse) {}
+  // Policies Management
+  rpc CreatePolicy(CreatePolicyRequest) returns (EmptyResponse) {}
+  rpc RemovePolicy(RemovePolicyRequest) returns (EmptyResponse) {}
+  rpc CreatePolicies(CreatePoliciesRequest) returns (EmptyResponse) {}
+  rpc RemovePolicies(RemovePoliciesRequest) returns (EmptyResponse) {}
 
   // Permissions Check
   rpc HasPermission(HasPermissionRequest) returns (HasPermissionResponse) {}
@@ -34,6 +37,7 @@ message EmptyResponse {}
 message PermissionDefinition {
   string object = 1;
   string action = 2;
+  string effect = 3;
 }
 
 // -----------------------------------------------------------------------------
@@ -50,18 +54,32 @@ message RemoveChildSubjectFromParentSubjectRequest {
   string parent = 2;
 }
 
+message RemoveSubjectRequest {
+  string subject = 1;
+}
+
 // -----------------------------------------------------------------------------
 // Permissions Management Defs
 // -----------------------------------------------------------------------------
 
-message GrantPermissionRequest {
+message CreatePolicyRequest {
   string subject = 1;
   PermissionDefinition permission = 2;
 }
 
-message RevokePermissionRequest {
+message RemovePolicyRequest {
   string subject = 1;
   PermissionDefinition permission = 2;
+}
+
+message CreatePoliciesRequest {
+  string subject = 1;
+  repeated PermissionDefinition permissions = 2;
+}
+
+message RemovePoliciesRequest {
+  string subject = 1;
+  repeated PermissionDefinition permissions = 2;
 }
 
 // -----------------------------------------------------------------------------
@@ -69,6 +87,11 @@ message RevokePermissionRequest {
 // -----------------------------------------------------------------------------
 
 message HasPermissionRequest {
+  message PermissionDefinition {
+    string object = 1;
+    string action = 2;
+  }
+
   string subject = 1;
   PermissionDefinition permission = 2;
 }
