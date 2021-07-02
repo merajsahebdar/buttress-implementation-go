@@ -9,7 +9,7 @@ package buttress;
 
 service RbacService {
   // Instance management
-  rpc CreateRbacInstance(EmptyRequest) returns (EmptyResponse) {}
+  rpc EnsureRbacInstance(EmptyRequest) returns (EmptyResponse) {}
 
   // Subjects Management
   rpc AddChildSubjectToParentSubject(AddChildSubjectToParentSubjectRequest) returns (EmptyResponse) {}
